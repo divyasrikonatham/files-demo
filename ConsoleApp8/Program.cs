@@ -1,85 +1,114 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 
-namespace ConsoleApp8
+namespace FilesDemo
+
 {
     class Program
-    {
-        public static bool checkPalin(string word)
-        {
-            int n = word.Length;
-            word = word.ToLower();
-            for (int i = 0; i < n; i++, n--)
-            {
-                if (word[i] != word[n - 1])
-                {
-                    return false;
-                }
-            }
-            return true;
-        }
-        public static int countPalin(string str)
-        {
 
-            str = str + " ";
-            string word = "";
-            int count = 0;
-            for (int i = 0; i < str.Length; i++)
+    {
+        public static bool ValidateInputString(string inputString)
+
+        {
+            Regex regex = new Regex("[!@#$%^&*]");
+            bool hasSpecialChars = regex.IsMatch(inputString);
+            if (hasSpecialChars == true)
             {
-                char ch = str[i];
-                if (ch != ' ')
+
+                return false;
+            }
+
+            else
+            {
+
+                return true;
+            }
+        }
+
+        public static int FindWordCount(string inputString)
+
+        {
+            string pattern = "[^\\w]";
+            string[] words = null;
+            int i = 0, wordCount = 0;
+            words = Regex.Split(inputString, pattern, RegexOptions.IgnoreCase);
+            for (i = words.GetLowerBound(0); i <= words.GetUpperBound(0); i++)
+            {
+                if (words[i].ToString() == string.Empty)
+                    wordCount = wordCount - 1;
+                wordCount = wordCount + 1;
+            }
+
+            return wordCount;
+        }
+
+        public static int FindPalindromeCount(string inputString)
+
+        {
+            int count = 0;
+            string[] words = inputString.Split(' ');
+            for (int i = 0; i < words.Length; i++)
+            {
+                if (words[i].Length > 1)
                 {
-                    word = word + ch;
-                }
-                else
-                {
-                    if (checkPalin(word))
+                    char[] charArray = words[i].ToCharArray();
+                    Array.Reverse(charArray);
+                    if (new string(charArray) == words[i])
                     {
                         count++;
                     }
-                    word = "";
                 }
             }
 
             return count;
         }
-        static void Main(string[] args)
+
+        public static void WriteFileToPath(string inputString)
+
         {
-            
+            string fileName = @"D:user_input.txt";
+            try
+
+            {
+                if (File.Exists(fileName))
+                {
+                    File.Delete(fileName);
+                }
+                using (StreamWriter sw = File.CreateText(fileName))
+                {
+                    sw.WriteLine("{0}", inputString);
+                }
+            }
+            catch
+
+            {
+                Console.WriteLine("Given Path not found to create file");
+            }
+        }
+
+        public static void Main(string[] args)
+        {
+
             Console.WriteLine("Please enter atleast 500 words description ");
             string str = Console.ReadLine();
-            Regex regex = new Regex("[!@#$%^&*]");
-            bool hasSpecialChars = regex.IsMatch(str);
-            if (hasSpecialChars == true)
+            if (ValidateInputString(str))
+            {
+                Console.WriteLine("Number of words in the description is {0}", FindWordCount(str));
+                Console.WriteLine("Number of palindromes in the description is {0}", FindPalindromeCount(str));
+                WriteFileToPath(str);
+            }
+
+            else
             {
                 Console.WriteLine("Please re-enter 500 words description without any of the !@#$%^&* special characters");
             }
-            else
-            {
-                int i = 0, wordCount = 1;
-                while (i <= str.Length - 1)
-                {
-                    if (str[i] == ' ' || str[i] == '\n' || str[i] == '\t')
-                    {
-                        wordCount++;
-                    }
-                    i++;
-                }
-                Console.WriteLine("Number of words in the description is {0}", wordCount);
-                Console.WriteLine("Number of palindromes in the description is {0}", countPalin(str));
-                var outputPath = @"D:\filesIntro\user_input.txt";
-                File.AppendAllText(outputPath, str);
-            }
+            Console.WriteLine("Enter any key to exit");
             Console.ReadKey();
-
         }
     }
 }
-        
-    
+
+
+
 
